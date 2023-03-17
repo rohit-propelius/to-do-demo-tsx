@@ -32,7 +32,31 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
+}
+
+.rootList {
+  display: flex;
+  align-items: center;
+}
+
+.listClass {
+  display: flex;
+  justify-content: space-between;
+  /* align-items: center; */
+}
+
+.row {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 2rem;
+  /* aligns all child elements (flex items) in a row */
+}
+
+.col {
+  flex: 1;
+  /* distributes space on the line equally among items */
 }
