@@ -1,7 +1,9 @@
 import { filterFun } from "../assests/app";
 
-
-export const reducer = (state: IReducerObj, action: IActionObj): IReducerObj => {
+export const reducer = (
+  state: IReducerObj,
+  action: IActionObj
+): IReducerObj => {
   let returnObj: IReducerObj = { ...state };
   switch (action.type) {
     case "SETDATA":
@@ -20,9 +22,10 @@ export const reducer = (state: IReducerObj, action: IActionObj): IReducerObj => 
       break;
     case "EDIT":
       if (!!action.value && typeof action.value === "string") {
-        let key: number | string = action.key;
-        if (typeof key === "string") key = parseInt(key);
-        state.todos[key] = action.value;
+        if (action.key !== undefined) {
+          let key: number = action.key;
+          state.todos[key] = action.value;
+        }
       }
 
       returnObj = {
@@ -34,10 +37,10 @@ export const reducer = (state: IReducerObj, action: IActionObj): IReducerObj => 
         ...state,
         completed: [
           ...state.completed,
-          state.todos.find((val: string, key: number) => key === action.value)!,
+          state.todos.find((val: string, key: number) => key === action.key)!,
         ],
         todos: state.todos.filter(
-          (val: string, key: number) => key !== action.value
+          (val: string, key: number) => key !== action.key
         ),
       };
       break;
@@ -46,7 +49,7 @@ export const reducer = (state: IReducerObj, action: IActionObj): IReducerObj => 
         ...state,
         count: state.count + 1,
         todos: state.todos.filter(
-          (val: string, key: number) => key !== action.value
+          (val: string, key: number) => key !== action.key
         ),
       };
       break;

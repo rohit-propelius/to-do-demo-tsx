@@ -3,7 +3,7 @@ export const arr = [
   "Make Breakfast",
   "Make Bed",
   "Pack lunch",
-  "Put clothes for laundry"
+  "Put clothes for laundry",
 ];
 
 export enum ACTIONS {
@@ -13,5 +13,5 @@ export enum ACTIONS {
   "COMPLETE" = "COMPLETE",
   "REMOVE" = "REMOVE",
   "REMOVEALL" = "REMOVEALL",
-  "FILTER" = "FILTER"
+  "FILTER" = "FILTER",
 }

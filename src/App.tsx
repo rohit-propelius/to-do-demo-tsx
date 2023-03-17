@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { ChangeEvent, useEffect, useReducer, useState } from "react";
 import "./App.css";
 import { arr, ACTIONS as AC } from "./data/data";
 import { reducer } from "./reducer/app";
@@ -10,73 +10,99 @@ let reducerObj: IReducerObj = {
   filterdData: [],
 };
 
+let globalStateObj: IGlobalStateObj = {
+  isValid: false,
+  values: {},
+  touched: {},
+  errors: {},
+};
+
 function App() {
-  const [tBVal, setTBVal] = useState("");
-  const [editVal, setEditVal] = useState({ key: NaN, value: "" });
+  const [globalStateVal, setGlobalStateVal] = useState(globalStateObj);
   const [state, dispatch] = useReducer(reducer, reducerObj);
 
   useEffect(() => {
     dispatch({
       type: AC.SETDATA,
       value: arr,
-      key: editVal.key,
     });
     return () => {
       dispatch({
         type: AC.SETDATA,
         value: [],
-        key: editVal.key,
       });
     };
   }, []);
 
   const addToList = () => {
-    if (tBVal.length > 0) {
+    let textboxVal = globalStateVal.values["taskbox"].value;
+    if (!!textboxVal && textboxVal.length > 0) {
       dispatch({
         type: AC.ADD,
-        value: tBVal,
-        key: editVal.key,
+        value: textboxVal,
       });
-      setTBVal("");
+      globalStateVal.values = {};
     }
   };
 
   const getEditValue = (key: number) => {
-    setEditVal({
-      key: key,
-      value: state.todos[key],
+    setGlobalStateVal({
+      ...globalStateVal,
+      values: {
+        ...globalStateVal.values,
+        editbox: {
+          key: key,
+          value: state.todos[key],
+        },
+      },
     });
   };
 
   const editToDo = () => {
-    let val = editVal;
-    dispatch({ type: AC.EDIT, key: val.key, value: val.value });
+    let val = globalStateVal.values["editbox"];
+
+    if (val.key !== undefined) {
+      if (!!val.value)
+        dispatch({ type: AC.EDIT, key: val.key, value: val.value });
+      else console.error("Empty Value Found for Edit!");
+    } else {
+      console.error("no element to edit found");
+    }
   };
 
   const completeToDo = (key: number) => {
     dispatch({
       type: AC.COMPLETE,
       value: key,
-      key: editVal.key,
+      key: key,
     });
   };
 
   const removeToDo = (key: number) => {
     dispatch({
       type: AC.REMOVE,
-      value: key,
-      key: editVal.key,
+      key: key,
     });
   };
 
   const RemoveFromList = () => {
     dispatch({
       type: AC.REMOVEALL,
-      value: tBVal,
-      key: editVal.key,
     });
-    setTBVal("");
-    setEditVal({ key: NaN, value: "" });
+    globalStateVal.values = {};
+  };
+
+  const setGlobalStateValFn = (e: ChangeEvent<HTMLInputElement>) => {
+    setGlobalStateVal({
+      ...globalStateVal,
+      values: {
+        ...globalStateVal.values,
+        [e.target.attributes[2].value]: {
+          ...globalStateVal.values[e.target.attributes[2].value],
+          value: e.target.value,
+        },
+      },
+    });
   };
 
   const formHandler = (e: React.FormEvent) => {
@@ -86,7 +112,6 @@ function App() {
     dispatch({
       type: AC.FILTER,
       value: searchVal,
-      key: editVal.key,
     });
   };
 
@@ -112,8 +137,8 @@ function App() {
             type="textbox"
             placeholder="Enter new task"
             name="taskbox"
-            value={tBVal}
-            onChange={(e) => setTBVal(e.target.value)}
+            value={globalStateVal.values["taskbox"]?.value || ""}
+            onChange={setGlobalStateValFn}
           />
         </div>
         <div className="col">
@@ -126,8 +151,8 @@ function App() {
             type="textbox"
             placeholder="Edit Task Value"
             name="editbox"
-            value={editVal.value}
-            onChange={(e) => setEditVal({ ...editVal, value: e.target.value })}
+            value={globalStateVal.values["editbox"]?.value || ""}
+            onChange={setGlobalStateValFn}
           />
         </div>
         <div className="col">
